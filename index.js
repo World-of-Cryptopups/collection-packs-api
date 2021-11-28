@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 
 const cors = require("cors");
-const { fetchAssets, fetchClaimAssets } = require("./fetcher");
+const { fetchAssets, fetchClaimAssets, fetchUnclaims } = require("./fetcher");
 
 // use cors
 app.use(cors());
@@ -32,6 +32,19 @@ app.get("/claimassets", async (req, res) => {
   const r = await fetchClaimAssets(scope);
 
   return res.status(200).json(r.rows);
+});
+
+app.get("/unclaims", async (req, res) => {
+  const { collection, account } = req.query;
+
+  if (collection === "" || account === "") {
+    res.status(200).json([]);
+    return;
+  }
+
+  const r = await fetchUnclaims(collection, account);
+
+  return res.status(200).json(r);
 });
 
 // run this only in dev environment

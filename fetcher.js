@@ -26,13 +26,21 @@ const filterAssets = async (data) => {
   return final;
 };
 
+const assetFetcher = async (collection, account = null, ids = null) => {
+  const url = `${
+    process.env.ATOMICASSETS_ENDPOINT
+  }/atomicassets/v1/assets?limit=1000&order=desc${
+    account ? `&owner=${account}` : ""
+  }&sort=transferred&collection_name=${collection}${ids ? `&ids=${ids}` : ""}`;
+
+  const r = await fetch(url);
+
+  return await r.json();
+};
+
 // fetch assets
 const fetchAssets = async (collection, account, pack_templates) => {
-  const r = await fetch(
-    `${process.env.ATOMICASSETS_ENDPOINT}/atomicassets/v1/assets?collection_blacklist=bridgebridge,testkogs2222,testkogs3333,testkogstest,mutantwarrio,mutantstest2,33testuplift,44testuplift,series2heros,horrorhorror,horrorstest2,horrorstest3,horrorstest4,horrorstest5,horrorstestx,btcotest2222,btcotest3333,btcotest1234,shynies5test,shynies4test,shyniestest2,shyniestest1,btco22222222,artvndngtst1,elementals11,mteora111111&limit=1000&order=desc&owner=${account}&sort=transferred&page=1&collection_name=${collection}`
-  );
-
-  const d = await r.json();
+  const d = await assetFetcher(collection, account);
 
   if (!d.success) {
     return [];
@@ -116,4 +124,37 @@ const confirmIfPack = async (templateid) => {
   return false;
 };
 
-module.exports = { fetchAssets, fetchClaimAssets, confirmIfPack };
+const fetchUnclaims = async (collection, account) => {
+  const r = await fetch(`${process.env.WAX_ENDPOINT}/v1/chain/get_table_rows`, {
+    method: "POST",
+    body: JSON.stringify({
+      json: true,
+      code: "atomicpacksx",
+      scope: "atomicpacksx",
+      table: "unboxpacks",
+      table_key: "unboxer",
+      lower_bound: account,
+      upper_bound: account,
+      index_position: 2,
+      key_type: "name",
+      limit: 1000,
+      reverse: false,
+      show_payer: false,
+    }),
+  });
+
+  const x = await r.json();
+
+  const assetids = x.rows.map((r) => r.pack_asset_id);
+
+  const d = await assetFetcher(collection, null, assetids.join(","));
+
+  return d.data;
+};
+
+module.exports = {
+  fetchAssets,
+  fetchClaimAssets,
+  fetchUnclaims,
+  confirmIfPack,
+};
