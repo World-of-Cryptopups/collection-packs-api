@@ -14,6 +14,22 @@ const fetchAssets = async (collection, account) => {
   return await r.json();
 };
 
+const fetchClaimAssets = async (scope) => {
+  const r = await fetch(`${process.env.WAX_ENDPOINT}/v1/chain/get_table_rows`, {
+    method: "POST",
+    body: JSON.stringify({
+      code: "atomicpacksx",
+      scope: scope,
+      table: "unboxassets",
+      index_position: 1,
+      limit: 1,
+      json: true,
+    }),
+  });
+
+  return await r.json();
+};
+
 // check if template is a pack
 const confirmIfPack = async (templateid) => {
   const r = await fetch(`${process.env.WAX_ENDPOINT}/v1/chain/get_table_rows`, {
@@ -74,7 +90,7 @@ app.get("/", async (req, res) => {
   const { collection, account } = req.query;
 
   if (collection === "" || account === "") {
-    res.status(200).send({});
+    res.status(200).json([]);
   }
 
   const r = await fetchAssets(collection, account);
@@ -85,7 +101,19 @@ app.get("/", async (req, res) => {
   const data = await filterAssets(r.data);
 
   res.set("Cache-Control", "public, max-age=120, s-maxage=120");
-  res.send(data);
+  res.json(data);
+});
+
+app.get("/claimassets", async (req, res) => {
+  const { scope } = req.query;
+
+  if (scope === "") {
+    res.status(200).json([]);
+  }
+
+  const r = await fetchClaimAssets(scope);
+
+  return res.status(200).json(r.rows);
 });
 
 // run this only in dev environment
