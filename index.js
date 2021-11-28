@@ -84,6 +84,7 @@ app.get("/", async (req, res) => {
 
   const data = await filterAssets(r.data);
 
+  res.set("Cache-Control", "public, max-age=120, s-maxage=120");
   res.send(data);
 });
 
