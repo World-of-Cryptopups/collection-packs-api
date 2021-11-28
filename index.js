@@ -22,7 +22,7 @@ const fetchClaimAssets = async (scope) => {
       scope: scope,
       table: "unboxassets",
       index_position: 1,
-      limit: 1,
+      limit: 1000,
       json: true,
     }),
   });
@@ -100,8 +100,7 @@ app.get("/", async (req, res) => {
 
   const data = await filterAssets(r.data);
 
-  res.set("Cache-Control", "public, max-age=120, s-maxage=120");
-  res.json(data);
+  res.status(200).json(data);
 });
 
 app.get("/claimassets", async (req, res) => {
