@@ -7,6 +7,8 @@ const filterAssets = async (data) => {
   const final = [];
 
   for (const r of data) {
+    if (!r.template) return;
+
     const template = r.template.template_id;
 
     // if pack is already confirmed, ok already
@@ -39,7 +41,7 @@ const assetFetcher = async (collection, account = null, ids = null) => {
 };
 
 // fetch assets
-const fetchAssets = async (collection, account, pack_templates) => {
+const fetchAssets = async (collection, account, schema_pack) => {
   const d = await assetFetcher(collection, account);
 
   if (!d.success) {
@@ -51,10 +53,11 @@ const fetchAssets = async (collection, account, pack_templates) => {
   const final = [];
 
   for (let i = d.data.length; i--; ) {
-    // console.log(confirmedPacks, ignoredPacks, i);
-
     const r = d.data[i];
-    if (pack_templates.includes(r.template.template_id)) {
+
+    if (!r.template) continue;
+
+    if (schema_pack.includes(r.schema.schema_name)) {
       final.push(r);
     }
 
@@ -68,8 +71,9 @@ const fetchAssets = async (collection, account, pack_templates) => {
 
     // const confirm = await confirmIfPack(template);
     // if (confirm) {
-    //   console.log(template);
     //   confirmedPacks.push(template);
+
+    //   console.log(template);
 
     //   final.push(r);
     //   continue;

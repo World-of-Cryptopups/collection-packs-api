@@ -9,14 +9,14 @@ const { fetchAssets, fetchClaimAssets, fetchUnclaims } = require("./fetcher");
 app.use(cors());
 
 app.get("/", async (req, res) => {
-  const { collection, account, pack_templates } = req.query;
+  const { collection, account, schema_pack } = req.query;
 
-  if (collection === "" || account === "" || !pack_templates) {
+  if (!collection || !account || !schema_pack) {
     res.status(200).json([]);
     return;
   }
 
-  const r = await fetchAssets(collection, account, pack_templates);
+  const r = await fetchAssets(collection, account, schema_pack);
 
   res.status(200).json(r);
 });
@@ -37,7 +37,7 @@ app.get("/claimassets", async (req, res) => {
 app.get("/unclaims", async (req, res) => {
   const { collection, account } = req.query;
 
-  if (collection === "" || account === "") {
+  if (!collection || !account) {
     res.status(200).json([]);
     return;
   }
