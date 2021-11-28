@@ -27,7 +27,7 @@ const filterAssets = async (data) => {
 };
 
 // fetch assets
-const fetchAssets = async (collection, account) => {
+const fetchAssets = async (collection, account, pack_templates) => {
   const r = await fetch(
     `${process.env.ATOMICASSETS_ENDPOINT}/atomicassets/v1/assets?collection_blacklist=bridgebridge,testkogs2222,testkogs3333,testkogstest,mutantwarrio,mutantstest2,33testuplift,44testuplift,series2heros,horrorhorror,horrorstest2,horrorstest3,horrorstest4,horrorstest5,horrorstestx,btcotest2222,btcotest3333,btcotest1234,shynies5test,shynies4test,shyniestest2,shyniestest1,btco22222222,artvndngtst1,elementals11,mteora111111&limit=1000&order=desc&owner=${account}&sort=transferred&page=1&collection_name=${collection}`
   );
@@ -38,8 +38,6 @@ const fetchAssets = async (collection, account) => {
     return [];
   }
 
-  console.log(d.data.length);
-
   //   const confirmedPacks = [];
   //   const ignoredPacks = [];
   const final = [];
@@ -48,7 +46,7 @@ const fetchAssets = async (collection, account) => {
     // console.log(confirmedPacks, ignoredPacks, i);
 
     const r = d.data[i];
-    if (process.env.PACK_TEMPLATES.includes(r.template.template_id)) {
+    if (pack_templates.includes(r.template.template_id)) {
       final.push(r);
     }
 

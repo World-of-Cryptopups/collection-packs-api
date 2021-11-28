@@ -9,15 +9,14 @@ const { fetchAssets, fetchClaimAssets } = require("./fetcher");
 app.use(cors());
 
 app.get("/", async (req, res) => {
-  const { collection, account } = req.query;
+  const { collection, account, pack_templates } = req.query;
 
-  if (collection === "" || account === "") {
+  if (collection === "" || account === "" || !pack_templates) {
     res.status(200).json([]);
+    return;
   }
 
-  const r = await fetchAssets(collection, account);
-
-  console.log(r.length);
+  const r = await fetchAssets(collection, account, pack_templates);
 
   res.status(200).json(r);
 });
@@ -27,6 +26,7 @@ app.get("/claimassets", async (req, res) => {
 
   if (scope === "") {
     res.status(200).json([]);
+    return;
   }
 
   const r = await fetchClaimAssets(scope);
