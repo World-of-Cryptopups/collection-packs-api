@@ -149,8 +149,12 @@ const fetchUnclaims = async (collection, account) => {
 
   const x = await r.json();
 
-  const assetids = x.rows.map((r) => r.pack_asset_id);
+  // check length
+  if (x.rows.length === 0) {
+    return [];
+  }
 
+  const assetids = x.rows.map((r) => r.pack_asset_id);
   const d = await assetFetcher(collection, null, assetids.join(","));
 
   return d.data;
